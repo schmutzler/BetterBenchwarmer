@@ -178,10 +178,10 @@ var Settings = /*#__PURE__*/ function() {
     return Settings;
 }();
 
-function canBuildAdditionOnPath(surface, path) {
+function canBuildAdditionOnPath(surface, path, settings) {
     if (!path || !surface) return false;
     if (surface.isWater) return false;
-    if (path.addition != null && plugin.settings.preserveOtherAdditions) return false;
+    if (path.addition != null && settings.preserveOtherAdditions) return false;
     return true;
 }
 
@@ -215,7 +215,7 @@ function Add(settings) {
                 return element.type === "footpath";
             });
             footpaths.forEach(function(path) {
-                if (canBuildAdditionOnPath(surface, path)) {
+                if (canBuildAdditionOnPath(surface, path, settings)) {
                     if (path.isQueue) {
                         paths.queues.push({ path: path, x: x, y: y2 });
                     } else if ((path === null || path === void 0 ? void 0 : path.slopeDirection) === null) {
