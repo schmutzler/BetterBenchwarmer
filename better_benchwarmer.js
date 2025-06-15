@@ -178,6 +178,31 @@ var Settings = /*#__PURE__*/ function() {
     return Settings;
 }();
 
+function canBuildAdditionOnPath(surface, path) {
+    if (!path || !surface) return false;
+    if (surface.isWater) return false;
+    if (path.addition != null && plugin.settings.preserveOtherAdditions) return false;
+    return true;
+}
+
+function ensureHasAddition(x, y, z, object) {
+    if (object == null) return;
+    var tile = map.getTile(x, y);
+    var elements = tile.elements.filter(function (e) {
+        return e.type === "footpath" && e.baseZ === z;
+    });
+    if (elements.length === 0) return;
+    var path = elements[0];
+    if (path.addition && path.addition.object === object) return;
+
+    var pos = { x: x * 32 + 16, y: y * 32 + 16, z: z };
+    if (map.canPlaceFootpathItem && map.placeFootpathItem) {
+        if (map.canPlaceFootpathItem(Object.assign({ object: object }, pos)) === 0) {
+            map.placeFootpathItem(Object.assign({ object: object }, pos));
+        }
+    }
+}
+
 // Main Logic - Benchwarmer Plugin
 function Add(settings) {
     var _loop = function(y2) {
