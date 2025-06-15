@@ -268,15 +268,7 @@ function Add(settings) {
     });
 }
 
-// Plugin Registration using registerPlugin(info, main)
-var info = {
-    name: "Better Benchwarmer",
-    version: "1.0",
-    type: "local",
-    authors: ["Your Name"],
-    licence: "MIT"
-};
-
+// Plugin Registration using registerPlugin
 function main() {
     // Execute the Add function with current settings
     var additions = context.getAllObjects("footpath_addition");
@@ -297,4 +289,13 @@ function main() {
     }
 }
 
-registerPlugin(info, main);
+registerPlugin({
+    name: "Better Benchwarmer",
+    version: "1.0",
+    type: "local",
+    authors: ["Your Name"],
+    licence: "MIT",
+    main: main,
+    minApiVersion: 68,
+    targetApiVersion: 77
+});
