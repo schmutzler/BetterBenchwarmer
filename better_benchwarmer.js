@@ -284,6 +284,71 @@ function main() {
     // Execute the Add function with current settings
     var additions = context.getAllObjects("footpath_addition");
     var settings = new Settings(additions);
+    function openMenu() {
+        var window = ui.getWindow("better-benchwarmer.window");
+        if (window) {
+            window.bringToFront();
+            return;
+        }
+
+        var benchItems = settings.benches.map(function (o) { return o.name; });
+        var binItems = settings.bins.map(function (o) { return o.name; });
+        var lampItems = settings.lamps.map(function (o) { return o.name; });
+        var tvItems = settings.queuetvs.map(function (o) { return o.name; });
+
+        ui.openWindow({
+            classification: "better-benchwarmer.window",
+            title: "Better Benchwarmer",
+            width: 200,
+            height: 110,
+            widgets: [
+                { type: "label", x: 10, y: 20, width: 70, height: 12, text: "Bench" },
+                {
+                    type: "dropdown",
+                    x: 80,
+                    y: 15,
+                    width: 110,
+                    height: 12,
+                    items: benchItems,
+                    selectedIndex: settings.selections.bench,
+                    onChange: function(index) { settings.bench = index; }
+                },
+                { type: "label", x: 10, y: 40, width: 70, height: 12, text: "Bin" },
+                {
+                    type: "dropdown",
+                    x: 80,
+                    y: 35,
+                    width: 110,
+                    height: 12,
+                    items: binItems,
+                    selectedIndex: settings.selections.bin,
+                    onChange: function(index) { settings.bin = index; }
+                },
+                { type: "label", x: 10, y: 60, width: 70, height: 12, text: "Lamp" },
+                {
+                    type: "dropdown",
+                    x: 80,
+                    y: 55,
+                    width: 110,
+                    height: 12,
+                    items: lampItems,
+                    selectedIndex: settings.selections.lamp,
+                    onChange: function(index) { settings.lamp = index; }
+                },
+                { type: "label", x: 10, y: 80, width: 70, height: 12, text: "Queue TV" },
+                {
+                    type: "dropdown",
+                    x: 80,
+                    y: 75,
+                    width: 110,
+                    height: 12,
+                    items: tvItems,
+                    selectedIndex: settings.selections.queuetv,
+                    onChange: function(index) { settings.queuetv = index; }
+                }
+            ]
+        });
+    }
     var running = false;
     function runAdd() {
         if (running)
@@ -298,6 +363,8 @@ function main() {
     } else {
         Add(settings);
     }
+
+    ui.registerMenuItem("Better Benchwarmer", openMenu);
 }
 
 registerPlugin({
