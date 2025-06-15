@@ -1,5 +1,10 @@
 "use strict";
 
+// Plugin metadata
+var VERSION = "1.0";
+var AUTHOR = "Devun Schmutzler";
+var LICENSE = "MIT";
+
 // Utilities and Helper Functions
 function _array_like_to_array(arr, len) {
     if (len == null || len > arr.length) len = arr.length;
@@ -297,10 +302,10 @@ function main() {
 
 registerPlugin({
     name: "Better Benchwarmer",
-    version: "1.0",
+    version: VERSION,
     type: "local",
-    authors: ["Your Name"],
-    licence: "MIT",
+    authors: [AUTHOR],
+    licence: LICENSE,
     main: main,
     minApiVersion: 68,
     targetApiVersion: 77
