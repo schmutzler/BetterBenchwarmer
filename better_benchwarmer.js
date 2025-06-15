@@ -281,7 +281,20 @@ function main() {
     // Execute the Add function with current settings
     var additions = context.getAllObjects("footpath_addition");
     var settings = new Settings(additions);
-    Add(settings);
+    var running = false;
+    function runAdd() {
+        if (running)
+            return;
+        running = true;
+        Add(settings);
+        running = false;
+    }
+    if (settings.asYouGo) {
+        context.subscribe("action.execute", runAdd);
+        runAdd();
+    } else {
+        Add(settings);
+    }
 }
 
 registerPlugin(info, main);
