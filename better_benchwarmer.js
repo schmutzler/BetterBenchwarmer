@@ -243,21 +243,20 @@ function Add(settings) {
     });
 }
 
-// Plugin Registration
-plugin.register("better_benchwarmer", {
-    title: "Better Benchwarmer",
-    description: "Automatically adds benches, bins, and lamps to your footpaths, alternating them for aesthetic value.",
-    author: "Your Name",
+// Plugin Registration using registerPlugin(info, main)
+var info = {
+    name: "Better Benchwarmer",
     version: "1.0",
-    settings: {
-        benches: Settings,
-        bins: Settings,
-        lamps: Settings,
-        buildBinsOnAllSlopedPaths: Settings
-    },
-    run: function() {
-        // Execute the Add function with current settings
-        var settings = new Settings(plugin.settings);
-        Add(settings);
-    }
-});
+    type: "local",
+    authors: ["Your Name"],
+    licence: "MIT"
+};
+
+function main() {
+    // Execute the Add function with current settings
+    var additions = context.getAllObjects("footpath_addition");
+    var settings = new Settings(additions);
+    Add(settings);
+}
+
+registerPlugin(info, main);
