@@ -9,6 +9,9 @@ Copy `better_benchwarmer.js` to your OpenRCT2 `plugin` folder and restart the ga
 ## Configuration
 
 When first loaded the plugin asks which bench, bin, lamp and queue TV objects to use. You can also change these selections later from the plugin menu.
+Open the **Better Benchwarmer** entry from the plugin menu to access drop-downs
+for selecting the bench, bin, lamp and queue TV objects. The chosen options are
+stored so they persist between sessions.
 
 Available options include:
 
