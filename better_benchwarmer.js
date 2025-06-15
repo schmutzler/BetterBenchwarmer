@@ -266,6 +266,12 @@ function Add(settings) {
 
         ensureHasAddition(x, y2, path.baseZ, addition);
     });
+
+    // Build queue paths with queue TVs
+    paths.queues.forEach(function (param) {
+        var path = param.path, x = param.x, y2 = param.y;
+        ensureHasAddition(x, y2, path.baseZ, settings.queuetv);
+    });
 }
 
 // Plugin Registration using registerPlugin
