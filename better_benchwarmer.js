@@ -300,7 +300,7 @@ function main() {
             classification: "better-benchwarmer.window",
             title: "Better Benchwarmer",
             width: 200,
-            height: 160,
+            height: 180,
             widgets: [
                 { type: "label", x: 10, y: 20, width: 70, height: 12, text: "Bench" },
                 {
@@ -375,6 +375,15 @@ function main() {
                     text: "Build as you go",
                     isChecked: settings.asYouGo,
                     onChange: function(checked) { settings.asYouGo = checked; }
+                },
+                {
+                    type: "button",
+                    x: 10,
+                    y: 160,
+                    width: 180,
+                    height: 12,
+                    text: "Build all",
+                    onClick: runAdd
                 }
             ]
         });
