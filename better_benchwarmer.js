@@ -214,29 +214,21 @@ function ensureHasAddition(x, y, z, object) {
             throw new Error(errorTitle + ": " + errorMessage);
     });
 }
-function getNextAddition(isSlope, settings) {
-    var pattern = [settings.bench, settings.bin, settings.lamp];
-    var attempts = 0;
-    while (attempts < pattern.length) {
-        var addition = pattern[nextIndex];
-        if (isSlope && addition === settings.bench) {
-            nextIndex = (nextIndex + 1) % pattern.length;
-            attempts++;
-            continue;
-        }
-        if (addition === lastAddition) {
-            nextIndex = (nextIndex + 1) % pattern.length;
-            attempts++;
-            continue;
-        }
-        lastAddition = addition;
-        nextIndex = (nextIndex + 1) % pattern.length;
-        return addition;
+var stepSinceLamp = 0;
+var nextIsBench = true;
+
+function getNextAddition(settings) {
+    if (stepSinceLamp === 1) {
+        stepSinceLamp = 0;
+        lastAddition = settings.lamp;
+        return settings.lamp;
     }
-    var fallback = pattern[nextIndex];
-    lastAddition = fallback;
-    nextIndex = (nextIndex + 1) % pattern.length;
-    return fallback;
+
+    var addition = nextIsBench ? settings.bench : settings.bin;
+    nextIsBench = !nextIsBench;
+    stepSinceLamp++;
+    lastAddition = addition;
+    return addition;
 }
 
 
@@ -262,7 +254,7 @@ function Add(settings) {
     }
 
     paths.forEach(function (p) {
-        var addition = getNextAddition(p.slope, settings);
+        var addition = getNextAddition(settings);
         ensureHasAddition(p.x, p.y, p.path.baseZ, addition);
     });
 
@@ -382,7 +374,7 @@ function main() {
             if (constructFlags === 1) {
                 addition = settings.queuetv;
             } else {
-                addition = getNextAddition(!!slope, settings);
+                addition = getNextAddition(settings);
             }
             ensureHasAddition(x / 32, y2 / 32, z, addition);
         }
