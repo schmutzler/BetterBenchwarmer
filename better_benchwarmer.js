@@ -399,8 +399,6 @@ function main() {
     if (settings.asYouGo) {
         context.subscribe("action.execute", runAdd);
         runAdd();
-    } else {
-        Add(settings);
     }
 
     ui.registerMenuItem("Better Benchwarmer", openMenu);
