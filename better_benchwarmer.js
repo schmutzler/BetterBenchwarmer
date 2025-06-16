@@ -1,378 +1,256 @@
 "use strict";
 
 // Plugin metadata
-var VERSION = "1.0";
-var AUTHOR = "Devun Schmutzler";
-var LICENSE = "MIT";
+var version = "1.2.0";
+var author = "Devun Schmutzler";
+var license = "MIT";
 
-// Utilities and Helper Functions
-function _array_like_to_array(arr, len) {
-    if (len == null || len > arr.length) len = arr.length;
-    for(var i = 0, arr2 = new Array(len); i < len; i++)arr2[i] = arr[i];
-    return arr2;
-}
+// placement sequence state
+var step = 0;
+var oddBench = true;
 
-function _array_without_holes(arr) {
-    if (Array.isArray(arr)) return _array_like_to_array(arr);
-}
-
-function _class_call_check(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-        throw new TypeError("Cannot call a class as a function");
-    }
-}
-
-function _defineProperties(target, props) {
-    for(var i = 0; i < props.length; i++){
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
-    }
-}
-
-function _create_class(Constructor, protoProps, staticProps) {
-    if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) _defineProperties(Constructor, staticProps);
-    return Constructor;
-}
-
-function _iterable_to_array(iter) {
-    if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter);
-}
-
-function _non_iterable_spread() {
-    throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-}
-
-function _to_consumable_array(arr) {
-    return _array_without_holes(arr) || _iterable_to_array(arr) || _unsupported_iterable_to_array(arr) || _non_iterable_spread();
-}
-
-function _unsupported_iterable_to_array(o, minLen) {
-    if (!o) return;
-    if (typeof o === "string") return _array_like_to_array(o, minLen);
-    var n = Object.prototype.toString.call(o).slice(8, -1);
-    if (n === "Object" && o.constructor) n = o.constructor.name;
-    if (n === "Map" || n === "Set") return Array.from(o);
-    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _array_like_to_array(o, minLen);
-}
-
-// Settings.ts - Add Lamp Support
-var BENCH = "Benchwarmer.Bench";
-var BIN = "Benchwarmer.Bin";
-var LAMP = "Benchwarmer.Lamp";
-var QUEUETV = "Benchwarmer.QueueTV";
-var BUILD = "Benchwarmer.BuildOnAllSlopedFootpaths";
-var PRESERVE = "Benchwarmer.PreserveOtherAdditions";
-var AS_YOU_GO = "Benchwarmer.BuildAsYouGo";
-
-var Settings = /*#__PURE__*/ function() {
-    function Settings(all) {
-        _class_call_check(this, Settings);
-        this.benches = all.filter(function(a) {
-            return a.identifier.includes("bench");
-        });
-        this.bins = all.filter(function(a) {
-            return a.identifier.includes("litter");
-        });
-        this.lamps = all.filter(function(a) {
-            return a.identifier.includes("lamp");
-        });
-        this.queuetvs = all.filter(function(a) {
-            return a.identifier.includes("qtv");
-        });
-    }
-
-    _create_class(Settings, [
-        {
-            key: "bench",
-            get: function get() {
-                return this.benches[this.selections.bench].index;
-            },
-            set: function set(index) {
-                context.sharedStorage.set(BENCH, index);
-            }
-        },
-        {
-            key: "bin",
-            get: function get() {
-                var _this_bins_this_selections_bin;
-                return (_this_bins_this_selections_bin = this.bins[this.selections.bin]) === null || _this_bins_this_selections_bin === void 0 ? void 0 : _this_bins_this_selections_bin.index;
-            },
-            set: function set(index) {
-                context.sharedStorage.set(BIN, index);
-            }
-        },
-        {
-            key: "lamp",
-            get: function get() {
-                var _this_lamps_this_selections_lamp;
-                return (_this_lamps_this_selections_lamp = this.lamps[this.selections.lamp]) === null || _this_lamps_this_selections_lamp === void 0 ? void 0 : _this_lamps_this_selections_lamp.index;
-            },
-            set: function set(index) {
-                context.sharedStorage.set(LAMP, index);
-            }
-        },
-        {
-            key: "queuetv",
-            get: function get() {
-                var _this_queuetvs_this_selections_queuetv;
-                return (_this_queuetvs_this_selections_queuetv = this.queuetvs[this.selections.queuetv]) === null || _this_queuetvs_this_selections_queuetv === void 0 ? void 0 : _this_queuetvs_this_selections_queuetv.index;
-            },
-            set: function set(index) {
-                context.sharedStorage.set(QUEUETV, index);
-            }
-        },
-        {
-            key: "selections",
-            get: function get() {
-                var bench = context.sharedStorage.get(BENCH, 0);
-                var bin = context.sharedStorage.get(BIN, 0);
-                var lamp = context.sharedStorage.get(LAMP, 0);
-                var queuetv = context.sharedStorage.get(QUEUETV, 0);
-                return {
-                    bench: bench,
-                    bin: bin,
-                    lamp: lamp,
-                    queuetv: queuetv
-                };
-            }
-        },
-        {
-            key: "buildBinsOnAllSlopedPaths",
-            get: function get() {
-                return context.sharedStorage.get(BUILD, false);
-            },
-            set: function set(value) {
-                context.sharedStorage.set(BUILD, value);
-            }
-        },
-        {
-            key: "preserveOtherAdditions",
-            get: function get() {
-                return context.sharedStorage.get(PRESERVE, true);
-            },
-            set: function set(value) {
-                context.sharedStorage.set(PRESERVE, value);
-            }
-        },
-        {
-            key: "configured",
-            get: function get() {
-                return this.bench !== null && this.bin !== null;
-            }
-        },
-        {
-            key: "queueTVConfigured",
-            get: function get() {
-                return this.queuetv !== null;
-            }
-        },
-        {
-            key: "asYouGo",
-            get: function get() {
-                return context.sharedStorage.get(AS_YOU_GO, false);
-            },
-            set: function set(value) {
-                context.sharedStorage.set(AS_YOU_GO, value);
-            }
+function getNextAddition(settings, isSlope) {
+    var addition;
+    if (step % 2 === 0) {
+        addition = settings.lamp;
+    } else {
+        if (isSlope) {
+            addition = settings.bin;
+        } else {
+            addition = oddBench ? settings.bench : settings.bin;
         }
-    ]);
-    return Settings;
-}();
+        oddBench = !oddBench;
+    }
+    step++;
+    return addition;
+}
+
+// add.ts
+function Add(settings) {
+    step = 0;
+    oddBench = true;
+    for (var y = 0; y < map.size.y; y++) {
+        for (var x = 0; x < map.size.x; x++) {
+            var elements = map.getTile(x, y).elements;
+            var surface = elements.filter(function (e) { return e.type === "surface"; })[0];
+            var footpaths = elements.filter(function (e) { return e.type === "footpath"; });
+            footpaths.forEach(function (path) {
+                if (!canBuildAdditionOnPath(surface, path, settings))
+                    return;
+                if (path.isQueue) {
+                    ensureHasAddition(x, y, path.baseZ, settings.queuetv);
+                } else {
+                    var isSlope = path.slopeDirection !== null;
+                    var addition = getNextAddition(settings, isSlope);
+                    ensureHasAddition(x, y, path.baseZ, addition);
+                }
+            });
+        }
+    }
+}
+
+function ensureHasAddition(x, y, z, addition) {
+    context.executeAction("footpathadditionplace", {
+        x: x * 32,
+        y: y * 32,
+        z: z,
+        object: addition
+    }, function(result) {
+        var errorTitle = result.errorTitle, errorMessage = result.errorMessage;
+        if (errorMessage) throw new Error(errorTitle + ": " + errorMessage);
+    });
+}
 
 function canBuildAdditionOnPath(surface, path, settings) {
-    if (!path || !surface) return false;
-    if (surface.isWater) return false;
-    if (path.addition != null && settings.preserveOtherAdditions) return false;
-    return true;
-}
-
-function ensureHasAddition(x, y, z, object) {
-    if (object == null) return;
-    var tile = map.getTile(x, y);
-    var elements = tile.elements.filter(function (e) {
-        return e.type === "footpath" && e.baseZ === z;
-    });
-    if (elements.length === 0) return;
-    var path = elements[0];
-    if (path.addition && path.addition.object === object) return;
-
-    var pos = { x: x * 32 + 16, y: y * 32 + 16, z: z };
-    if (map.canPlaceFootpathItem && map.placeFootpathItem) {
-        if (map.canPlaceFootpathItem(Object.assign({ object: object }, pos)) === 0) {
-            map.placeFootpathItem(Object.assign({ object: object }, pos));
-        }
+    if (!surface || !path) return false;
+    if (settings.preserveOtherAdditions && path.addition !== null) return false;
+    if (surface.hasOwnership) return true;
+    if (surface.hasConstructionRights && surface.baseHeight !== path.baseHeight) {
+        return true;
     }
+    return false;
 }
 
-// Main Logic - Benchwarmer Plugin
-function Add(settings) {
-    var _loop = function(y2) {
-        var _loop = function(x) {
-            var elements = map.getTile(x, y2).elements;
-            var surface = elements.filter(function(element) {
-                return element.type === "surface";
-            })[0];
-            var footpaths = elements.filter(function(element) {
-                return element.type === "footpath";
-            });
-            footpaths.forEach(function(path) {
-                if (canBuildAdditionOnPath(surface, path, settings)) {
-                    if (path.isQueue) {
-                        paths.queues.push({ path: path, x: x, y: y2 });
-                    } else if ((path === null || path === void 0 ? void 0 : path.slopeDirection) === null) {
-                        paths.unsloped.push({ path: path, x: x, y: y2 });
-                    } else {
-                        paths.sloped.push({ path: path, x: x, y: y2 });
-                    }
-                }
-            });
-        };
-        for(var x = 0; x < map.size.x; x++)_loop(x);
-    };
-    var paths = {
-        unsloped: [],
-        sloped: [],
-        queues: []
-    };
-    for(var y2 = 0; y2 < map.size.y; y2++)_loop(y2);
+// settings.ts
+var BENCH = "Benchwarmer.Bench";
+var BIN = "Benchwarmer.Bin";
+var QUEUETV = "Benchwarmer.QueueTV";
+var PRESERVE = "Benchwarmer.PreserveOtherAdditions";
+var AS_YOU_GO = "Benchwarmer.BuildAsYouGo";
+var LAMP = "Benchwarmer.Lamp";
 
-    // Build unsloped paths with alternating benches and bins and lamps
-    paths.unsloped.forEach(function(param, index) {
-        var path = param.path, x = param.x, y2 = param.y;
-        var bench = settings.bench, bin = settings.bin, lamp = settings.lamp;
-        var addition;
-        
-        if (index % 3 === 0) {
-            addition = bench; // Every 3rd one is a bench
-        } else if (index % 3 === 1) {
-            addition = bin; // Every 3rd one after the bench is a bin
-        } else {
-            addition = lamp; // The rest are lamps
-        }
-
-        ensureHasAddition(x, y2, path.baseZ, addition);
+var Settings = function(all) {
+    this.benches = all.filter(function(a) {
+        return a.identifier.includes("bench");
     });
-
-    // Build sloped paths with alternating bins and lamps
-    paths.sloped.forEach(function(param, index) {
-        var path = param.path, x = param.x, y2 = param.y;
-        var buildBinsOnAllSlopedPaths = settings.buildBinsOnAllSlopedPaths;
-        var addition;
-        
-        if (buildBinsOnAllSlopedPaths) {
-            addition = settings.bin; // If enabled, add bins to sloped paths
-        } else {
-            addition = index % 2 === 0 ? settings.bin : settings.lamp; // Alternating bins and lamps
-        }
-
-        ensureHasAddition(x, y2, path.baseZ, addition);
+    this.bins = all.filter(function(a) {
+        return a.identifier.includes("litter");
     });
-
-    // Build queue paths with queue TVs
-    paths.queues.forEach(function (param) {
-        var path = param.path, x = param.x, y2 = param.y;
-        ensureHasAddition(x, y2, path.baseZ, settings.queuetv);
+    this.lamps = all.filter(function(a) {
+        return a.identifier.includes("lamp");
     });
+    this.queuetvs = all.filter(function(a) {
+        return a.identifier.includes("qtv");
+    });
+    // choose the three-bulb lamp by default if available
+    if (context.sharedStorage.get(LAMP) === undefined) {
+        var defaultLamp = this.lamps.findIndex(function(a) {
+            var id = a.identifier.toLowerCase();
+            return id.includes("three") || id.includes("3") || id.includes("triple");
+        });
+        context.sharedStorage.set(LAMP, defaultLamp >= 0 ? defaultLamp : 0);
+    }
+};
+
+Settings.prototype = {
+    get bench() {
+        return this.benches[this.selections.bench].index;
+    },
+    set bench(index) {
+        context.sharedStorage.set(BENCH, index);
+    },
+    get bin() {
+        var _a = this.bins[this.selections.bin];
+        return _a && _a.index;
+    },
+    set bin(index) {
+        context.sharedStorage.set(BIN, index);
+    },
+    get lamp() {
+        var _a = this.lamps[this.selections.lamp];
+        return _a && _a.index;
+    },
+    set lamp(index) {
+        context.sharedStorage.set(LAMP, index);
+    },
+    get queuetv() {
+        var _a = this.queuetvs[this.selections.queuetv];
+        return _a && _a.index;
+    },
+    set queuetv(index) {
+        context.sharedStorage.set(QUEUETV, index);
+    },
+    get selections() {
+        var bench = context.sharedStorage.get(BENCH, 0);
+        var bin = context.sharedStorage.get(BIN, 0);
+        var lamp = context.sharedStorage.get(LAMP, 0);
+        var queuetv = context.sharedStorage.get(QUEUETV, 0);
+        return { bench: bench, bin: bin, lamp: lamp, queuetv: queuetv };
+    },
+    get preserveOtherAdditions() {
+        return context.sharedStorage.get(PRESERVE, true);
+    },
+    set preserveOtherAdditions(value) {
+        context.sharedStorage.set(PRESERVE, value);
+    },
+    get configured() {
+        return this.bench !== null && this.bin !== null && this.lamp !== null;
+    },
+    get queueTVConfigured() {
+        return this.queuetv !== null;
+    },
+    get asYouGo() {
+        return context.sharedStorage.get(AS_YOU_GO, false);
+    },
+    set asYouGo(value) {
+        context.sharedStorage.set(AS_YOU_GO, value);
+    }
+};
+
+// ui.ts
+var LABEL_X = 10;
+var INPUT_X = 70;
+var y = 0;
+
+function Document() {
+    y = 0;
+    return Array.prototype.slice.call(arguments);
 }
 
-// Plugin Registration using registerPlugin
+function Dropdown(text, choices, selectedIndex, onChange) {
+    var items = choices.map(function(b) {
+        return b.name + " " + b.identifier;
+    });
+    y += 20;
+    return [
+        { type: "label", x: LABEL_X, y: y, width: 60, height: 10, text: text },
+        { type: "dropdown", x: INPUT_X, y: y, width: 200, height: 10, items: items, selectedIndex: selectedIndex, onChange: onChange }
+    ];
+}
+
+function Checkbox(text, isChecked, onChange) {
+    y += 15;
+    return { type: "checkbox", x: LABEL_X, y: y, width: 200, height: 15, isChecked: isChecked, text: text, onChange: onChange };
+}
+
+function Button(text, onClick) {
+    y += 20;
+    return { type: "button", text: text, x: 10, y: y, width: 100, height: 20, onClick: onClick };
+}
+
+// benchwarmer.ts
+var name = "Better Benchwarmer";
 function main() {
-    // Execute the Add function with current settings
     var additions = context.getAllObjects("footpath_addition");
     var settings = new Settings(additions);
-    function openMenu() {
-        var window = ui.getWindow("better-benchwarmer.window");
-        if (window) {
-            window.bringToFront();
-            return;
-        }
-
-        var benchItems = settings.benches.map(function (o) { return o.name; });
-        var binItems = settings.bins.map(function (o) { return o.name; });
-        var lampItems = settings.lamps.map(function (o) { return o.name; });
-        var tvItems = settings.queuetvs.map(function (o) { return o.name; });
-
-        ui.openWindow({
-            classification: "better-benchwarmer.window",
-            title: "Better Benchwarmer",
-            width: 200,
-            height: 110,
-            widgets: [
-                { type: "label", x: 10, y: 20, width: 70, height: 12, text: "Bench" },
-                {
-                    type: "dropdown",
-                    x: 80,
-                    y: 15,
-                    width: 110,
-                    height: 12,
-                    items: benchItems,
-                    selectedIndex: settings.selections.bench,
-                    onChange: function(index) { settings.bench = index; }
-                },
-                { type: "label", x: 10, y: 40, width: 70, height: 12, text: "Bin" },
-                {
-                    type: "dropdown",
-                    x: 80,
-                    y: 35,
-                    width: 110,
-                    height: 12,
-                    items: binItems,
-                    selectedIndex: settings.selections.bin,
-                    onChange: function(index) { settings.bin = index; }
-                },
-                { type: "label", x: 10, y: 60, width: 70, height: 12, text: "Lamp" },
-                {
-                    type: "dropdown",
-                    x: 80,
-                    y: 55,
-                    width: 110,
-                    height: 12,
-                    items: lampItems,
-                    selectedIndex: settings.selections.lamp,
-                    onChange: function(index) { settings.lamp = index; }
-                },
-                { type: "label", x: 10, y: 80, width: 70, height: 12, text: "Queue TV" },
-                {
-                    type: "dropdown",
-                    x: 80,
-                    y: 75,
-                    width: 110,
-                    height: 12,
-                    items: tvItems,
-                    selectedIndex: settings.selections.queuetv,
-                    onChange: function(index) { settings.queuetv = index; }
-                }
-            ]
+    ui.registerMenuItem(name, function() {
+        var window = ui.openWindow({
+            title: name,
+            id: 1,
+            classification: name,
+            width: 300,
+            height: 180,
+            widgets: Document.apply(null, [].concat(
+                Dropdown("Bench:", settings.benches, settings.selections.bench, function(index) { settings.bench = index; }),
+                Dropdown("Bin:", settings.bins, settings.selections.bin, function(index) { settings.bin = index; }),
+                Dropdown("Lamp:", settings.lamps, settings.selections.lamp, function(index) { settings.lamp = index; }),
+                Dropdown("Queue TV:", settings.queuetvs, settings.selections.queuetv, function(index) { settings.queuetv = index; }),
+                [
+                    Checkbox("Preserve other additions (e.g. lamps)", settings.preserveOtherAdditions, function(checked) { settings.preserveOtherAdditions = checked; }),
+                    Checkbox("Add benches and bins as paths are placed", settings.asYouGo, function(checked) { settings.asYouGo = checked; }),
+                    Button("Build on All Paths", function() {
+                        if (settings.configured) {
+                            try {
+                                Add(settings);
+                            } catch (e) {
+                                ui.showError("Error Building Benches/Bins", e.message);
+                            }
+                        }
+                        window.close();
+                    })
+                ]
+            ))
         });
-    }
-    var running = false;
-    function runAdd() {
-        if (running)
-            return;
-        running = true;
-        Add(settings);
-        running = false;
-    }
-    if (settings.asYouGo) {
-        context.subscribe("action.execute", runAdd);
-        runAdd();
-    } else {
-        Add(settings);
-    }
-
-    ui.registerMenuItem("Better Benchwarmer", openMenu);
+    });
+    context.subscribe("action.execute", function(param) {
+        var action = param.action, args = param.args, isClientOnly = param.isClientOnly;
+        if (action === "footpathplace" && settings.asYouGo && !isClientOnly) {
+            var x = args.x, y = args.y, z = args.z, slope = args.slope, constructFlags = args.constructFlags;
+            var addition;
+            if (constructFlags === 1) {
+                addition = settings.queuetv;
+            } else {
+                addition = getNextAddition(settings, slope);
+            }
+            context.executeAction("footpathadditionplace", {
+                x: x,
+                y: y,
+                z: z,
+                object: addition
+            }, function(result) {
+                var errorTitle = result.errorTitle, errorMessage = result.errorMessage;
+                if (errorMessage) throw new Error(errorTitle + ": " + errorMessage);
+            });
+        }
+    });
 }
 
 registerPlugin({
-    name: "Better Benchwarmer",
-    version: VERSION,
+    name: name,
+    version: version,
+    licence: license,
+    authors: [author],
     type: "local",
-    authors: [AUTHOR],
-    licence: LICENSE,
     main: main,
     minApiVersion: 68,
     targetApiVersion: 77
