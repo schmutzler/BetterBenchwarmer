@@ -189,7 +189,7 @@ function Button(text, onClick) {
 }
 
 // benchwarmer.ts
-var name = "Benchwarmer";
+var name = "Better Benchwarmer";
 function main() {
     var additions = context.getAllObjects("footpath_addition");
     var settings = new Settings(additions);
@@ -253,5 +253,5 @@ registerPlugin({
     type: "local",
     main: main,
     minApiVersion: 68,
-    targetApiVersion: 77
+    targetApiVersion: 68
 });

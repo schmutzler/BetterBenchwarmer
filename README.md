@@ -5,7 +5,7 @@ BetterBenchwarmer extends the original Benchwarmer plugin for OpenRCT2. It autom
 ## Installation
 
 Copy `better_benchwarmer.js` to your OpenRCT2 `plugin` folder and restart the game. The plugin will be available in the in-game plugin list.
-The script requires OpenRCT2 with API version 77 or later.
+The script requires OpenRCT2 with API version 68 or later.
 
 ## Configuration
 
