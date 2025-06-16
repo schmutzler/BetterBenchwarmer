@@ -20,4 +20,5 @@ Available options include:
 - **Build bins on all sloped paths** – if enabled, bins are placed on sloped sections of path instead of alternating with lamps.
 - **Preserve other additions** – skip paths that already have additions when adding benches or bins.
 - **Build as you go** – automatically add benches, bins and lamps after each build action rather than running manually.
+- **Build all** – manually add benches, bins, lamps and queue TVs to all paths at once.
 
