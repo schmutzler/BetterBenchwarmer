@@ -1,6 +1,6 @@
 # BetterBenchwarmer
 
-BetterBenchwarmer extends the original Benchwarmer plugin for OpenRCT2. It automatically adds benches, litter bins and lamps to footpaths and can optionally place queue TVs. The plugin can run once on demand or keep building as you modify paths.
+BetterBenchwarmer extends the original Benchwarmer plugin for OpenRCT2. It automatically adds benches, litter bins and lamps to footpaths and can optionally place queue TVs. When "Build as you go" is disabled, use the **Build all** button from the plugin menu to populate all paths at once.
 
 ## Installation
 
@@ -20,4 +20,5 @@ Available options include:
 - **Build bins on all sloped paths** – if enabled, bins are placed on sloped sections of path instead of alternating with lamps.
 - **Preserve other additions** – skip paths that already have additions when adding benches or bins.
 - **Build as you go** – automatically add benches, bins and lamps after each build action rather than running manually.
+- **Build all** – manually add benches, bins, lamps and queue TVs to all paths at once.
 
