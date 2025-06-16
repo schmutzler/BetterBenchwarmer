@@ -253,5 +253,5 @@ registerPlugin({
     type: "local",
     main: main,
     minApiVersion: 68,
-    targetApiVersion: 68
+    targetApiVersion: 77
 });
