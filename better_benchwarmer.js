@@ -300,7 +300,7 @@ function main() {
             classification: "better-benchwarmer.window",
             title: "Better Benchwarmer",
             width: 200,
-            height: 110,
+            height: 160,
             widgets: [
                 { type: "label", x: 10, y: 20, width: 70, height: 12, text: "Bench" },
                 {
@@ -345,6 +345,36 @@ function main() {
                     items: tvItems,
                     selectedIndex: settings.selections.queuetv,
                     onChange: function(index) { settings.queuetv = index; }
+                },
+                {
+                    type: "checkbox",
+                    x: 10,
+                    y: 100,
+                    width: 180,
+                    height: 12,
+                    text: "Build bins on all sloped paths",
+                    isChecked: settings.buildBinsOnAllSlopedPaths,
+                    onChange: function(checked) { settings.buildBinsOnAllSlopedPaths = checked; }
+                },
+                {
+                    type: "checkbox",
+                    x: 10,
+                    y: 120,
+                    width: 180,
+                    height: 12,
+                    text: "Preserve other additions",
+                    isChecked: settings.preserveOtherAdditions,
+                    onChange: function(checked) { settings.preserveOtherAdditions = checked; }
+                },
+                {
+                    type: "checkbox",
+                    x: 10,
+                    y: 140,
+                    width: 180,
+                    height: 12,
+                    text: "Build as you go",
+                    isChecked: settings.asYouGo,
+                    onChange: function(checked) { settings.asYouGo = checked; }
                 }
             ]
         });
