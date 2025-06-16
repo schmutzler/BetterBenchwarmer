@@ -6,42 +6,29 @@ var author = "Devun Schmutzler";
 var license = "MIT";
 
 // placement sequence state
-var sequence = ["lamp", "bench", "lamp", "bin"];
-var nextIndex = 0;
-var lastPlaced = null;
+var step = 0;
+var oddBench = true;
 
 function getNextAddition(settings, isSlope) {
-    var item = sequence[nextIndex];
-
-    if (isSlope && item === "bench") {
-        // skip bench on slopes
-        var next = (nextIndex + 1) % sequence.length;
-        item = sequence[next];
-        // avoid repeating the previous item
-        if (item === lastPlaced) {
-            next = (next + 1) % sequence.length;
-            item = sequence[next];
-        }
-        nextIndex = (next + 1) % sequence.length;
+    var addition;
+    if (step % 2 === 0) {
+        addition = settings.lamp;
     } else {
-        nextIndex = (nextIndex + 1) % sequence.length;
+        if (isSlope) {
+            addition = settings.bin;
+        } else {
+            addition = oddBench ? settings.bench : settings.bin;
+        }
+        oddBench = !oddBench;
     }
-
-    lastPlaced = item;
-    switch (item) {
-        case "lamp":
-            return settings.lamp;
-        case "bench":
-            return settings.bench;
-        default:
-            return settings.bin;
-    }
+    step++;
+    return addition;
 }
 
 // add.ts
 function Add(settings) {
-    nextIndex = 0;
-    lastPlaced = null;
+    step = 0;
+    oddBench = true;
     for (var y = 0; y < map.size.y; y++) {
         for (var x = 0; x < map.size.x; x++) {
             var elements = map.getTile(x, y).elements;
@@ -105,6 +92,14 @@ var Settings = function(all) {
     this.queuetvs = all.filter(function(a) {
         return a.identifier.includes("qtv");
     });
+    // choose the three-bulb lamp by default if available
+    if (context.sharedStorage.get(LAMP) === undefined) {
+        var defaultLamp = this.lamps.findIndex(function(a) {
+            var id = a.identifier.toLowerCase();
+            return id.includes("three") || id.includes("3") || id.includes("triple");
+        });
+        context.sharedStorage.set(LAMP, defaultLamp >= 0 ? defaultLamp : 0);
+    }
 };
 
 Settings.prototype = {

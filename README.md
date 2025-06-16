@@ -13,6 +13,7 @@ When first loaded the plugin asks which bench, bin, lamp and queue TV objects to
 Open the **Better Benchwarmer** entry from the plugin menu to access drop-downs
 for selecting the bench, bin, lamp and queue TV objects. The chosen options are
 stored so they persist between sessions.
+If a three-bulb lamp is available it will be selected automatically the first time the plugin runs.
 
 Available options include:
 
