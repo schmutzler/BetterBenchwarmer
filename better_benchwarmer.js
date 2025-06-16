@@ -217,22 +217,26 @@ function ensureHasAddition(x, y, z, object) {
 function getNextAddition(isSlope, settings) {
     var pattern = [settings.bench, settings.bin, settings.lamp];
     var attempts = 0;
-    var addition;
-    while (attempts < 3) {
-        addition = pattern[nextIndex];
-        nextIndex = (nextIndex + 1) % pattern.length;
+    while (attempts < pattern.length) {
+        var addition = pattern[nextIndex];
         if (isSlope && addition === settings.bench) {
+            nextIndex = (nextIndex + 1) % pattern.length;
             attempts++;
             continue;
         }
         if (addition === lastAddition) {
+            nextIndex = (nextIndex + 1) % pattern.length;
             attempts++;
             continue;
         }
-        break;
+        lastAddition = addition;
+        nextIndex = (nextIndex + 1) % pattern.length;
+        return addition;
     }
-    lastAddition = addition;
-    return addition;
+    var fallback = pattern[nextIndex];
+    lastAddition = fallback;
+    nextIndex = (nextIndex + 1) % pattern.length;
+    return fallback;
 }
 
 
