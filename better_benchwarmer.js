@@ -6,7 +6,7 @@ var AUTHOR = "Devun Schmutzler";
 var LICENSE = "MIT";
 
 var nextIndex = 0;
-var lastAddition = null;
+var benchBinIndex = 0;
 
 // Utilities and Helper Functions
 function _array_like_to_array(arr, len) {
@@ -215,22 +215,17 @@ function ensureHasAddition(x, y, z, object) {
     });
 }
 function getNextAddition(settings, isSlope) {
-    var options = [settings.bench, settings.bin, settings.lamp];
-    for (var i = 0; i < options.length; i++) {
-        var addition = options[nextIndex % options.length];
-        nextIndex++;
-
-        if (isSlope && addition === settings.bench)
-            continue;
-        if (addition === lastAddition)
-            continue;
-
-        lastAddition = addition;
-        return addition;
+    var addition;
+    // Even index = bench/bin, odd index = lamp
+    if (nextIndex % 2 === 1) {
+        addition = settings.lamp;
+    } else {
+        var benchOrBin = benchBinIndex % 2 === 0 ? settings.bench : settings.bin;
+        benchBinIndex++;
+        addition = isSlope ? settings.bin : benchOrBin;
     }
-    // Fallback in case all options were skipped
-    lastAddition = options[0];
-    return options[0];
+    nextIndex++;
+    return addition;
 }
 
 
