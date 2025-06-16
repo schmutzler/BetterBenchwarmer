@@ -214,21 +214,23 @@ function ensureHasAddition(x, y, z, object) {
             throw new Error(errorTitle + ": " + errorMessage);
     });
 }
-var stepSinceLamp = 0;
-var nextIsBench = true;
+function getNextAddition(settings, isSlope) {
+    var options = [settings.bench, settings.bin, settings.lamp];
+    for (var i = 0; i < options.length; i++) {
+        var addition = options[nextIndex % options.length];
+        nextIndex++;
 
-function getNextAddition(settings) {
-    if (stepSinceLamp === 1) {
-        stepSinceLamp = 0;
-        lastAddition = settings.lamp;
-        return settings.lamp;
+        if (isSlope && addition === settings.bench)
+            continue;
+        if (addition === lastAddition)
+            continue;
+
+        lastAddition = addition;
+        return addition;
     }
-
-    var addition = nextIsBench ? settings.bench : settings.bin;
-    nextIsBench = !nextIsBench;
-    stepSinceLamp++;
-    lastAddition = addition;
-    return addition;
+    // Fallback in case all options were skipped
+    lastAddition = options[0];
+    return options[0];
 }
 
 
@@ -254,7 +256,7 @@ function Add(settings) {
     }
 
     paths.forEach(function (p) {
-        var addition = getNextAddition(settings);
+        var addition = getNextAddition(settings, p.slope);
         ensureHasAddition(p.x, p.y, p.path.baseZ, addition);
     });
 
@@ -374,7 +376,7 @@ function main() {
             if (constructFlags === 1) {
                 addition = settings.queuetv;
             } else {
-                addition = getNextAddition(settings);
+                addition = getNextAddition(settings, slope !== 0);
             }
             ensureHasAddition(x / 32, y2 / 32, z, addition);
         }
