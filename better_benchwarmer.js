@@ -1,7 +1,7 @@
 "use strict";
 
 // Plugin metadata
-var VERSION = "1.0";
+var VERSION = "1.2.0";
 var AUTHOR = "Devun Schmutzler";
 var LICENSE = "MIT";
 
@@ -300,7 +300,7 @@ function main() {
             classification: "better-benchwarmer.window",
             title: "Better Benchwarmer",
             width: 200,
-            height: 110,
+            height: 155,
             widgets: [
                 { type: "label", x: 10, y: 20, width: 70, height: 12, text: "Bench" },
                 {
@@ -345,23 +345,68 @@ function main() {
                     items: tvItems,
                     selectedIndex: settings.selections.queuetv,
                     onChange: function(index) { settings.queuetv = index; }
+                },
+                {
+                    type: "checkbox",
+                    x: 10,
+                    y: 100,
+                    width: 180,
+                    height: 12,
+                    text: "Preserve other additions",
+                    isChecked: settings.preserveOtherAdditions,
+                    onChange: function(checked) { settings.preserveOtherAdditions = checked; }
+                },
+                {
+                    type: "checkbox",
+                    x: 10,
+                    y: 115,
+                    width: 180,
+                    height: 12,
+                    text: "Build as you go",
+                    isChecked: settings.asYouGo,
+                    onChange: function(checked) { settings.asYouGo = checked; }
+                },
+                {
+                    type: "button",
+                    text: "Build All",
+                    x: 10,
+                    y: 135,
+                    width: 180,
+                    height: 12,
+                    onClick: buildAll
                 }
             ]
         });
     }
-    var running = false;
-    function runAdd() {
-        if (running)
-            return;
-        running = true;
+    function buildAll() {
         Add(settings);
-        running = false;
     }
-    if (settings.asYouGo) {
-        context.subscribe("action.execute", runAdd);
-        runAdd();
-    } else {
-        Add(settings);
+
+    context.subscribe("action.execute", function(event) {
+        var action = event.action, args = event.args, isClientOnly = event.isClientOnly;
+        if (action === "footpathplace" && settings.asYouGo && !isClientOnly) {
+            var x = args.x, y2 = args.y, z = args.z, slope = args.slope, constructFlags = args.constructFlags;
+            var tileX = x / 32, tileY = y2 / 32;
+            var addition;
+            if (constructFlags === 1) {
+                addition = settings.queuetv;
+            } else if (slope) {
+                addition = (tileX + tileY) % 2 === 0 ? settings.bin : settings.lamp;
+            } else {
+                var mod = (tileX + tileY) % 3;
+                addition = mod === 0 ? settings.bench : mod === 1 ? settings.bin : settings.lamp;
+            }
+            context.executeAction("footpathadditionplace", {
+                x: x,
+                y: y2,
+                z: z,
+                object: addition
+            });
+        }
+    });
+
+    if (!settings.asYouGo) {
+        buildAll();
     }
 
     ui.registerMenuItem("Better Benchwarmer", openMenu);
