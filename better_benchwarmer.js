@@ -200,12 +200,16 @@ function ensureHasAddition(x, y, z, object) {
     var path = elements[0];
     if (path.addition && path.addition.object === object) return;
 
-    var pos = { x: x * 32 + 16, y: y * 32 + 16, z: z };
-    if (map.canPlaceFootpathItem && map.placeFootpathItem) {
-        if (map.canPlaceFootpathItem(Object.assign({ object: object }, pos)) === 0) {
-            map.placeFootpathItem(Object.assign({ object: object }, pos));
-        }
-    }
+    context.executeAction("footpathadditionplace", {
+        x: x * 32,
+        y: y * 32,
+        z: z,
+        object: object
+    }, function (result) {
+        var errorTitle = result.errorTitle, errorMessage = result.errorMessage;
+        if (errorMessage)
+            throw new Error(errorTitle + ": " + errorMessage);
+    });
 }
 
 // Main Logic - Benchwarmer Plugin

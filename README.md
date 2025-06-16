@@ -18,7 +18,7 @@ Available options include:
 
 - **Bench, Bin and Lamp objects** – choose which items to place on paths.
 - **Queue TV** – optional queue television for queue lines.
-- **Preserve other additions** – skip paths that already have additions when adding benches or bins.
+- **Preserve other additions** – skip paths that already have additions when adding benches or bins. This option is enabled by default.
 - **Build as you go** – automatically add benches, bins and lamps after each build action rather than running manually.
 - **Build All** – apply benches, bins, lamps and queue TVs to every path using the configured pattern.
 
