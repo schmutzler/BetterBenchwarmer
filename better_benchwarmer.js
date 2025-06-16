@@ -5,6 +5,9 @@ var VERSION = "1.2.0";
 var AUTHOR = "Devun Schmutzler";
 var LICENSE = "MIT";
 
+var nextIndex = 0;
+var lastAddition = null;
+
 // Utilities and Helper Functions
 function _array_like_to_array(arr, len) {
     if (len == null || len > arr.length) len = arr.length;
@@ -211,75 +214,56 @@ function ensureHasAddition(x, y, z, object) {
             throw new Error(errorTitle + ": " + errorMessage);
     });
 }
+function getNextAddition(isSlope, settings) {
+    var pattern = [settings.bench, settings.bin, settings.lamp];
+    var attempts = 0;
+    var addition;
+    while (attempts < 3) {
+        addition = pattern[nextIndex];
+        nextIndex = (nextIndex + 1) % pattern.length;
+        if (isSlope && addition === settings.bench) {
+            attempts++;
+            continue;
+        }
+        if (addition === lastAddition) {
+            attempts++;
+            continue;
+        }
+        break;
+    }
+    lastAddition = addition;
+    return addition;
+}
+
 
 // Main Logic - Benchwarmer Plugin
 function Add(settings) {
-    var _loop = function(y2) {
-        var _loop = function(x) {
+    var paths = [];
+    var queues = [];
+    for (var y2 = 0; y2 < map.size.y; y2++) {
+        for (var x = 0; x < map.size.x; x++) {
             var elements = map.getTile(x, y2).elements;
-            var surface = elements.filter(function(element) {
-                return element.type === "surface";
-            })[0];
-            var footpaths = elements.filter(function(element) {
-                return element.type === "footpath";
-            });
-            footpaths.forEach(function(path) {
+            var surface = elements.filter(function (e) { return e.type === "surface"; })[0];
+            var footpaths = elements.filter(function (e) { return e.type === "footpath"; });
+            footpaths.forEach(function (path) {
                 if (canBuildAdditionOnPath(surface, path, settings)) {
                     if (path.isQueue) {
-                        paths.queues.push({ path: path, x: x, y: y2 });
-                    } else if ((path === null || path === void 0 ? void 0 : path.slopeDirection) === null) {
-                        paths.unsloped.push({ path: path, x: x, y: y2 });
+                        queues.push({ path: path, x: x, y: y2 });
                     } else {
-                        paths.sloped.push({ path: path, x: x, y: y2 });
+                        paths.push({ path: path, x: x, y: y2, slope: path.slopeDirection !== null });
                     }
                 }
             });
-        };
-        for(var x = 0; x < map.size.x; x++)_loop(x);
-    };
-    var paths = {
-        unsloped: [],
-        sloped: [],
-        queues: []
-    };
-    for(var y2 = 0; y2 < map.size.y; y2++)_loop(y2);
-
-    // Build unsloped paths with alternating benches and bins and lamps
-    paths.unsloped.forEach(function(param, index) {
-        var path = param.path, x = param.x, y2 = param.y;
-        var bench = settings.bench, bin = settings.bin, lamp = settings.lamp;
-        var addition;
-        
-        if (index % 3 === 0) {
-            addition = bench; // Every 3rd one is a bench
-        } else if (index % 3 === 1) {
-            addition = bin; // Every 3rd one after the bench is a bin
-        } else {
-            addition = lamp; // The rest are lamps
         }
+    }
 
-        ensureHasAddition(x, y2, path.baseZ, addition);
+    paths.forEach(function (p) {
+        var addition = getNextAddition(p.slope, settings);
+        ensureHasAddition(p.x, p.y, p.path.baseZ, addition);
     });
 
-    // Build sloped paths with alternating bins and lamps
-    paths.sloped.forEach(function(param, index) {
-        var path = param.path, x = param.x, y2 = param.y;
-        var buildBinsOnAllSlopedPaths = settings.buildBinsOnAllSlopedPaths;
-        var addition;
-        
-        if (buildBinsOnAllSlopedPaths) {
-            addition = settings.bin; // If enabled, add bins to sloped paths
-        } else {
-            addition = index % 2 === 0 ? settings.bin : settings.lamp; // Alternating bins and lamps
-        }
-
-        ensureHasAddition(x, y2, path.baseZ, addition);
-    });
-
-    // Build queue paths with queue TVs
-    paths.queues.forEach(function (param) {
-        var path = param.path, x = param.x, y2 = param.y;
-        ensureHasAddition(x, y2, path.baseZ, settings.queuetv);
+    queues.forEach(function (p) {
+        ensureHasAddition(p.x, p.y, p.path.baseZ, settings.queuetv);
     });
 }
 
@@ -390,22 +374,13 @@ function main() {
         var action = event.action, args = event.args, isClientOnly = event.isClientOnly;
         if (action === "footpathplace" && settings.asYouGo && !isClientOnly) {
             var x = args.x, y2 = args.y, z = args.z, slope = args.slope, constructFlags = args.constructFlags;
-            var tileX = x / 32, tileY = y2 / 32;
             var addition;
             if (constructFlags === 1) {
                 addition = settings.queuetv;
-            } else if (slope) {
-                addition = (tileX + tileY) % 2 === 0 ? settings.bin : settings.lamp;
             } else {
-                var mod = (tileX + tileY) % 3;
-                addition = mod === 0 ? settings.bench : mod === 1 ? settings.bin : settings.lamp;
+                addition = getNextAddition(!!slope, settings);
             }
-            context.executeAction("footpathadditionplace", {
-                x: x,
-                y: y2,
-                z: z,
-                object: addition
-            });
+            ensureHasAddition(x / 32, y2 / 32, z, addition);
         }
     });
 
